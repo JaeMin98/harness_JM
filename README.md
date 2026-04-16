@@ -51,6 +51,91 @@ Anthropic의 [Harness design for long-running application development](https://w
 ## How To Instruct Codex In A Fresh Project
 새 레포에서 Codex에게는 처음부터 긴 구현 지시를 한 번에 주기보다, 아래처럼 단계적으로 시키는 편이 안정적이다.
 
+하지만 당신이 원하는 방식이 `내가 목표만 말하면 Codex가 하네스를 스스로 참조하며 자동으로 진행하는 구조`라면, 처음부터 그렇게 지시할 수도 있다. 핵심은 Codex에게:
+
+- 먼저 하네스 문서를 읽게 하고
+- 현재 단계에서 어떤 역할로 움직일지 스스로 선택하게 하고
+- 한 번에 한 기능만 구현하게 하고
+- 기능별 테스트와 통합 테스트를 구분하게 하고
+- 매 단계마다 tracker와 artifact를 갱신하게 하는 것
+
+이다.
+
+### Recommended Autonomous Command
+새 프로젝트에서 가장 추천하는 시작 명령은 아래 형태다.
+
+```text
+이 레포는 harness_JM 기반 프로젝트다. 먼저 AGENTS.md, harness/core/docs/index.md, harness/core/workflows/pipeline.md, apps/<project-name>/harness/docs/index.md, apps/<project-name>/harness/plans/tracker.md 를 스스로 읽고, 그 규칙에 따라 작업해줘.
+
+내 요청을 먼저 Planner 관점에서 spec과 roadmap으로 정리하고, 그 다음에는 필요한 역할을 스스로 전환해가며 진행해줘.
+
+- 구현은 항상 한 번에 한 기능씩만 진행해
+- 구현 전에는 Generator/Evaluator 계약을 먼저 잡아
+- 테스트는 feature test와 integration test를 구분해
+- UI/디자인 작업은 내가 명시적으로 요청한 경우에만 수행해
+- 각 단계가 끝날 때마다 tracker와 handoff artifact를 갱신해
+- 범위가 애매하면 멋대로 크게 확장하지 말고 현재 기능 하나 기준으로 좁혀서 진행해
+
+이번 요청: <여기에 실제 목표를 적기>
+```
+
+이 명령의 의도는 “방법은 하네스가 정하고, 나는 목표만 준다”를 Codex에게 분명히 전달하는 것이다.
+
+### Short Autonomous Command
+더 짧게 쓰고 싶으면 아래처럼 해도 된다.
+
+```text
+이 프로젝트는 harness_JM 규칙대로 진행해줘. 관련 harness 문서를 스스로 읽고, Planner -> Generator -> Security Reviewer -> Evaluator 흐름을 필요에 따라 적용해. 한 번에 한 기능만 구현하고, feature test와 integration test를 분리하고, UI는 내가 요청할 때만 다뤄줘. tracker도 계속 갱신해. 이번 목표는 <실제 목표>.
+```
+
+### Best Practice For Autonomous Use
+- 목표는 짧게 주고, 방법은 하네스에 맡긴다.
+- 처음부터 여러 기능을 한 번에 요구하지 않는다.
+- `이번 기능 하나` 수준으로 요청할수록 자동화가 안정적이다.
+- UI가 필요 없으면 UI를 언급하지 않는다.
+- 검증까지 원하면 `테스트와 평가까지 끝내줘`를 함께 적는다.
+- 장기 작업이면 `각 단계 결과를 tracker에 반영해줘`를 같이 적는다.
+
+### Good Command Examples
+```text
+이 프로젝트는 harness_JM 규칙대로 자동 진행해줘. 하네스 문서를 먼저 읽고, 이번에는 사용자 로그인 기능 하나만 설계부터 구현, feature test, integration test, tracker 갱신까지 진행해줘. UI 작업은 하지 마.
+```
+
+```text
+harness_JM 방식으로 진행해줘. 이번 목표는 결제 내역 조회 기능 하나를 추가하는 것이다. 필요한 역할을 스스로 전환하면서 contract 작성, 구현, 검증, tracker 갱신까지 해줘.
+```
+
+```text
+먼저 harness 문서를 읽고 자동으로 작업해줘. 이번에는 관리자 대시보드 UI가 필요하니 Design Critic도 포함해줘. 하지만 이번 턴에서는 대시보드의 통계 카드 표시 기능 하나만 진행해줘.
+```
+
+### Bad Command Examples
+아래 같은 요청은 자동화 품질을 떨어뜨릴 수 있다.
+
+```text
+전체 서비스 다 만들어줘.
+```
+
+이유:
+- 범위가 너무 넓다.
+- 한 기능 단위 진행 원칙이 깨진다.
+
+```text
+로그인, 결제, 관리자 페이지, 알림 시스템까지 한 번에 다 해줘.
+```
+
+이유:
+- contract가 여러 기능에 걸쳐 퍼진다.
+- 테스트와 handoff가 흐려진다.
+
+```text
+예쁘게 UI도 만들고 백엔드도 만들고 알아서 다 해줘.
+```
+
+이유:
+- UI가 기본 활성화되지 않는데도 범위가 섞인다.
+- 어떤 기능부터 해야 하는지 불분명하다.
+
 ### 1. Planner 호출
 프로젝트를 처음 열었을 때:
 

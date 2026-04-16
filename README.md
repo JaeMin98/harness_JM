@@ -81,6 +81,59 @@ Anthropic의 [Harness design for long-running application development](https://w
 
 이 명령의 의도는 “방법은 하네스가 정하고, 나는 목표만 준다”를 Codex에게 분명히 전달하는 것이다.
 
+### One-Shot Bootstrap Command
+프로젝트명을 예를 들어 `my_project`라고 줄 때, 템플릿 clone, 프로젝트 폴더 준비, 하네스 문서 초기화 방향까지 한 번에 지시하고 싶다면 아래 프롬프트를 그대로 쓰면 된다.
+
+```text
+내 새 프로젝트 이름은 `my_project`다.
+
+`harness_JM` 템플릿을 기반으로 새 프로젝트를 시작해줘. 아래 순서까지 한 번에 진행해:
+
+1. `harness_JM` 레포를 clone해서 새 작업 디렉토리를 만든다
+2. 새 레포 또는 새 작업 폴더의 이름을 `my_project` 기준으로 맞춘다
+3. `apps/sample-project/`를 복사해서 `apps/my_project/`를 만든다
+4. `apps/my_project/` 안의 project-level harness 문서에서 placeholder를 `my_project` 기준으로 초기화한다
+5. `AGENTS.md`, `harness/core/docs/index.md`, `harness/core/workflows/pipeline.md`, `apps/my_project/harness/docs/index.md`, `apps/my_project/harness/plans/tracker.md`를 스스로 읽고 작업 준비를 끝낸다
+6. 내 아래 요청을 Planner 관점에서 spec, roadmap, initial feature list로 확장한다
+7. 그 뒤에는 하네스 규칙에 따라 필요한 역할을 스스로 전환하며 자동 진행한다
+
+작업 규칙:
+- 구현은 항상 한 번에 한 기능씩만 진행해
+- 구현 전에는 Generator/Evaluator contract를 먼저 작성해
+- feature test와 integration test를 분리해
+- UI/디자인 작업은 내가 명시적으로 요청할 때만 진행해
+- 각 단계가 끝날 때마다 tracker와 handoff artifact를 갱신해
+- 범위가 크면 멋대로 한 번에 구현하지 말고 첫 기능 하나로 쪼개서 시작해
+
+이번 프로젝트 목표:
+<여기에 실제 목표를 적기>
+```
+
+이 프롬프트는 새 프로젝트를 부트스트랩할 때 가장 강력한 시작점이다.
+
+### One-Shot Bootstrap Command With Repository Creation
+새 GitHub 레포 이름까지 `my_project`로 맞추고 싶다면 아래처럼 더 구체적으로 시킬 수 있다.
+
+```text
+내 새 프로젝트 이름은 `my_project`다.
+
+`harness_JM`을 clone해서 `my_project` 작업 디렉토리를 만들고, `apps/sample-project/`를 `apps/my_project/`로 복사해 초기화해줘. 가능하면 git 원격도 새 프로젝트 이름 기준으로 맞출 수 있게 준비해줘.
+
+그 다음에는 하네스 문서를 스스로 읽고, Planner -> Generator -> Security Reviewer -> Evaluator 흐름을 필요에 따라 적용하면서 자동으로 진행해줘.
+
+규칙은 아래를 반드시 따라:
+- 구현은 한 번에 한 기능만
+- 구현 전 contract 작성
+- feature test / integration test 분리
+- UI는 내가 요청할 때만
+- tracker와 handoff artifact 계속 갱신
+
+이번 프로젝트 목표:
+<여기에 실제 목표를 적기>
+```
+
+이 버전은 로컬 부트스트랩뿐 아니라 “새 프로젝트 이름에 맞춘 전체 시작 흐름”까지 함께 암시한다.
+
 ### Short Autonomous Command
 더 짧게 쓰고 싶으면 아래처럼 해도 된다.
 

@@ -8,7 +8,7 @@ Anthropic의 planner-generator-evaluator 패턴을 참고해, spec 작성, contr
 기본 흐름은 아래 순서를 따른다.
 
 1. Planner
-2. Design Critic (optional)
+2. Design Critic (requested only)
 3. Generator
 4. Security Reviewer
 5. Evaluator
@@ -16,23 +16,26 @@ Anthropic의 planner-generator-evaluator 패턴을 참고해, spec 작성, contr
 
 ## 3. Core Principles
 - 짧은 사용자 요청은 먼저 planner가 spec과 roadmap으로 확장한다.
-- 구현은 한 번에 한 chunk 또는 sprint씩 진행한다.
+- 구현은 sprint 안에서도 한 번에 한 기능씩만 진행한다.
 - generator와 evaluator는 구현 전에 sprint contract를 먼저 합의한다.
 - contract에는 scope, non-goals, done criteria, test criteria를 남긴다.
 - communication은 파일 기반 artifact로 남겨 다음 session이 바로 이어받게 한다.
 - context가 흐려지면 compact만 고집하지 말고 handoff artifact와 함께 reset도 고려한다.
 - harness 복잡도는 고정값이 아니며, 모델이 잘하는 영역에서는 더 단순하게 유지한다.
+- UI와 디자인 단계는 사용자가 명시적으로 요청했을 때만 활성화한다.
 
 ## 4. Sprint Contract Rule
 각 sprint 시작 전에 최소 아래 항목을 문서화한다.
 
 - sprint goal
+- single feature for this implementation turn
 - in scope
 - out of scope
 - implementation notes
-- test criteria
+- feature test criteria
+- integration test criteria
 - security concerns
-- design criteria if needed
+- design criteria if explicitly requested
 
 Generator는 계약안을 제안하고, Evaluator는 검증 가능성과 누락 여부를 확인한다.
 합의가 끝나기 전에는 구현을 확정하지 않는다.
@@ -40,6 +43,7 @@ Generator는 계약안을 제안하고, Evaluator는 검증 가능성과 누락 
 ## 5. Evaluation Rule
 - Evaluator는 product depth, functionality, visual design, code quality를 기준으로 본다.
 - 기준은 가능하면 PASS or FAIL로 남긴다.
+- 기능별 테스트와 통합 테스트를 구분해 남긴다.
 - 중요한 기준 하나라도 임계값 아래면 sprint는 실패다.
 - feedback은 재현 가능하고 다음 수정으로 연결 가능해야 한다.
 

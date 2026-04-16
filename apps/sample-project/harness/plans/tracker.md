@@ -1,4 +1,4 @@
-﻿# Sample App Tracker
+﻿# Sample Project Tracker
 
 ## Current Phase
 - status: NOT_STARTED
@@ -9,3 +9,4 @@
 - write product spec
 - write architecture notes
 - create first implementation task brief
+

@@ -1,4 +1,4 @@
-﻿# Sample App Product Spec
+﻿# Sample Project Product Spec
 
 ## Inputs
 - placeholder
@@ -11,3 +11,4 @@
 
 ## Edge Cases
 - placeholder
+

@@ -1,4 +1,4 @@
-﻿# Sample App Roadmap
+﻿# Sample Project Roadmap
 
 ## Phase 1
 - 문제와 범위 정리
@@ -11,3 +11,4 @@
 ## Phase 3
 - UI 또는 integration 구현
 - 보안/신뢰성 검토
+

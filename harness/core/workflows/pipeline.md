@@ -1,44 +1,57 @@
-# Pipeline Workflow
+﻿# Pipeline Workflow
 
 ## 1. Purpose
-이 문서는 저장소 공통 작업 흐름의 기본 순서를 정의한다.
-세부 역할 규칙은 roles 문서에서 따로 다룬다.
+이 문서는 long-running Codex harness의 기본 작업 흐름을 정의한다.
+Anthropic의 planner-generator-evaluator 패턴을 참고해, spec 작성, contract 합의, 구현, 회고를 분리한다.
 
 ## 2. Default Order
 기본 흐름은 아래 순서를 따른다.
 
-1. PM
-2. Coder
-3. Security Reviewer
-4. Tester
-5. PM
+1. Planner
+2. Design Critic (optional)
+3. Generator
+4. Security Reviewer
+5. Evaluator
+6. Planner
 
-## 3. Optional Stages
-- Designer는 UI, 정보 구조, 사용자 흐름이 바뀌는 작업에서만 사용한다.
-- Designer가 들어가면 순서는 `PM -> Designer -> Coder`가 된다.
-- optional 단계가 필요 없으면 보고서에 `SKIPPED`로 남긴다.
+## 3. Core Principles
+- 짧은 사용자 요청은 먼저 planner가 spec과 roadmap으로 확장한다.
+- 구현은 한 번에 한 chunk 또는 sprint씩 진행한다.
+- generator와 evaluator는 구현 전에 sprint contract를 먼저 합의한다.
+- contract에는 scope, non-goals, done criteria, test criteria를 남긴다.
+- communication은 파일 기반 artifact로 남겨 다음 session이 바로 이어받게 한다.
+- context가 흐려지면 compact만 고집하지 말고 handoff artifact와 함께 reset도 고려한다.
+- harness 복잡도는 고정값이 아니며, 모델이 잘하는 영역에서는 더 단순하게 유지한다.
 
-## 4. Handoff Rule
-- 앞 단계가 끝나기 전에는 다음 단계로 넘어가지 않는다.
-- 각 단계는 자기 역할의 기준으로만 판단한다.
-- 각 단계는 짧은 handoff 보고서와 판정 값을 남긴다.
-- 각 단계는 handoff 전에 cleanup 상태를 확인한다.
-- risky cleanup이나 큰 구현 변경 전에는 git checkpoint를 먼저 만든다.
-- 기본 cleanup 실행은 `python3 harness/scripts/cleanup_agent.py apps/<app-name>`로 남긴다.
-- cleanup agent를 바로 실행하기 어렵거나 위험을 먼저 보고 싶으면 `cleanup_check.py`를 선행한다.
-- 프로세스 조회가 막힌 환경에서는 `--skip-processes` 사용 여부를 handoff에 함께 남긴다.
-- 판정 값은 `APPROVED`, `CHANGES_REQUESTED`, `BLOCKED`, `SKIPPED`만 사용한다.
-- 다음 단계는 `APPROVED` 또는 `SKIPPED`일 때만 진행한다.
-- `CHANGES_REQUESTED` 또는 `BLOCKED`가 나오면 현재 작업의 시도 횟수를 기록하고 갱신한다.
+## 4. Sprint Contract Rule
+각 sprint 시작 전에 최소 아래 항목을 문서화한다.
 
-## 5. Output Rule
-- PM은 범위와 완료 기준을 남긴다.
-- Designer는 화면 구조와 표현 기준을 남긴다.
-- Coder는 구현 결과와 짧은 셀프 체크 결과를 남긴다.
-- Security Reviewer는 보안 판단 결과를 남긴다.
-- Tester는 검증 결과와 판정 값을 남긴다.
+- sprint goal
+- in scope
+- out of scope
+- implementation notes
+- test criteria
+- security concerns
+- design criteria if needed
 
-## 6. Completion Rule
-- 마지막 PM 검토까지 끝나야 한 사이클이 완료된다.
-- 마지막 PM 판정이 `APPROVED`일 때만 완료로 표시한다.
-- 보류나 축소가 필요하면 다음 사이클로 넘긴다.
+Generator는 계약안을 제안하고, Evaluator는 검증 가능성과 누락 여부를 확인한다.
+합의가 끝나기 전에는 구현을 확정하지 않는다.
+
+## 5. Evaluation Rule
+- Evaluator는 product depth, functionality, visual design, code quality를 기준으로 본다.
+- 기준은 가능하면 PASS or FAIL로 남긴다.
+- 중요한 기준 하나라도 임계값 아래면 sprint는 실패다.
+- feedback은 재현 가능하고 다음 수정으로 연결 가능해야 한다.
+
+## 6. Handoff Rule
+- 각 단계는 다음 단계가 바로 읽을 수 있는 artifact를 남긴다.
+- tracker와 ongoing artifact는 현재 상태, 남은 리스크, 다음 액션을 포함한다.
+- risky cleanup이나 큰 변경 전에는 git checkpoint를 먼저 만든다.
+- handoff 전에는 cleanup 상태를 확인한다.
+- 프로세스 조회가 막힌 환경에서는 `--skip-processes` 사용 여부를 함께 기록한다.
+
+## 7. Completion Rule
+- 마지막 planner 검토까지 끝나야 한 사이클이 완료된다.
+- 마지막 planner 판정이 `APPROVED`일 때만 완료로 표시한다.
+- model capability가 충분해 평가 단계가 과한 비용만 만든다면 evaluator를 축소할 수 있다.
+- 단, generator solo 성능 경계 바깥 작업에서는 evaluator를 유지한다.

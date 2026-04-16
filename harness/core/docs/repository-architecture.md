@@ -1,4 +1,4 @@
-# Repository Architecture
+﻿# Repository Architecture
 
 ## 1. Purpose
 이 문서는 저장소의 최상위 구조와 폴더별 책임을 정의한다.
@@ -44,3 +44,4 @@ git ref 기반 checkpoint는 `.git/refs/harness-checkpoints/` 아래에 둔다.
 - 새 앱은 `apps/<app-name>/` 구조를 그대로 따라 시작한다.
 - 공통으로 반복되는 규칙만 `harness/core/`로 올린다.
 - 구조가 커져도 최상위 폴더 수는 적게 유지한다.
+
